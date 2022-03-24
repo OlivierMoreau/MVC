@@ -1,0 +1,1 @@
+Barebones HTML/CSS/PHP MVC boilerplate for very simple projects
