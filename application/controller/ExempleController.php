@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 require_once APP . "controller/MainController.php";
 
@@ -9,37 +9,47 @@ require_once APP . "controller/MainController.php";
 *
 *Gets called by the dispatcher on start 
 *
-*Fromat your methods as "name" + "Action" to be recognised by the dispatcher
+*Format your methods as "name" + "Action" to be recognised by the dispatcher
 */
 
 class ExempleController extends MainController
 {
 
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->view = new View();
         $this->model = new Model();
-        
-        //Ask the model to connect to a Database connection param is db name 
-        $this->model->connectDB("test2");
-        $this->model->connectDB("test");
-        $this->model->set_connec("test2");
 
+        //Ask the model to connect to a Database connection param is db name 
+
+        $this->model->connectDB("test");
+        $this->model->set_connec("test");
     }
-    
+
     /** 
-    *
-    *Tells the model to connect to the provided DB and to fetch the exemple table and the view to display it in a table.
-    *
-    */
-    public function listAction($return = null)
+     *
+     *Tells the model to connect to the provided DB and to fetch the exemple table and the view to display it in a table.
+     *
+     */
+    public function listAction()
     {
-        //Call model method to returns a list of the table rows
-        $list = $this->model->getList("user");
+        $table = 'employees';
+        if (array_key_exists('table', $_GET)) {
+            $table = $_GET['table'];
+        }
         
-        $this->view->displayList($list, $return);       
+        $col_names = $this->model->getTableColumnNames($table);
+
+        //Call model method to returns a list of the table rows
+        $list = $this->model->getList($table);
+        if (gettype($list) === 'array') {
+            $this->view->displayList($table, $list, $col_names);
+        } else {
+            $this->view->displayError($list . "<- getList returned this");
+        }
     }
-    
+
     /*
     *
     *Display the form to Updates a row of the table. Id of the row passed as a GET param.
@@ -47,16 +57,20 @@ class ExempleController extends MainController
     */
     public function updateAction()
     {
-        //checks for id Param
-        if(isset($_GET['id']))
-        {
-            $row =  $this->model->getItem($_GET['id'], "user");
-            $this->view->displayForm("Edition profil", $row, 'update'); 
-        }else {
-            $this->listAction();
-        }  
-    }
+        $table = 'employees';
+        if (array_key_exists('table', $_GET)) {
+            $table = $_GET['table'];
+        }
         
+        //checks for id Param
+        if (isset($_GET['id'])) {
+            $row =  $this->model->getItem($_GET['id'], $table);
+            $this->view->displayForm("Edition profil", $row, 'update');
+        } else {
+            $this->listAction();
+        }
+    }
+
     /*
     *
     *Calls the model for an update on the database 
@@ -65,16 +79,15 @@ class ExempleController extends MainController
     public function updateDBAction()
     {
         $vals = $this->checkUserInputs();
-        if($vals && isset($_POST["id"]))
-        {
+        if ($vals && isset($_POST["id"])) {
             array_push($vals, $_POST["id"]);
-            $return = $this->model->updateDB("user", $vals);
+            $return = $this->model->updateDB("employees", $vals);
             $return ? $this->listAction() : $this->listAction('updating');
-        }else{
+        } else {
             $this->listAction();
         }
     }
-    
+
     /*
     *
     *Display the form to add entry to the DB
@@ -82,9 +95,9 @@ class ExempleController extends MainController
     */
     public function addAction()
     {
-        $this->view->displayForm("Add new entry", ['','','',''], 'add');
+        $this->view->displayForm("Add new entry", ['', '', '', ''], 'add');
     }
-    
+
     /*
     *
     *Calls the model for an insert on the database
@@ -93,41 +106,43 @@ class ExempleController extends MainController
     public function addDBAction()
     {
         $vals = $this->checkUserInputs();
-        if($vals){
-            $return = $this->model->insertDB("user", $vals);
+        if ($vals) {
+            $return = $this->model->insertDB("employees", $vals);
             $return ? $this->listAction() : $this->listAction('insert in');
-        }else{
+        } else {
             $this->listAction();
         }
     }
-    
+
     private function checkUserInputs()
     {
-        
-         $name = $age = $comment = "";
-        
-        if(isset($_POST["name"]) && is_string($_POST["name"]))
-        {
-            $name = $_POST["name"];
-        }
-        else {
+
+        $prénom = $nom = $email = "";
+
+        if (isset($_POST["prénom"]) && is_string($_POST["prénom"])) {
+            $prénom = $_POST["prénom"];
+        } else {
             return false;
         }
-        
-        if(isset($_POST["age"]) && is_numeric($_POST["age"]))
-        {
-            $age = $_POST["age"];
-        }else {
+
+        if (isset($_POST["nom"]) && is_numeric($_POST["nom"])) {
+            $nom = $_POST["nom"];
+        } else {
             return false;
         }
-        if(isset($_POST["comment"]) && is_string($_POST["comment"]))
-        {
-            $comment = $_POST["comment"];
-        }else {
-            $comment = "";
+        if (isset($_POST["email"]) && is_string($_POST["email"])) {
+            $email = $_POST["email"];
+        } else {
+            $email = "";
         }
-        
-        return [$name, $age, $comment];
+
+        return [$prénom, $nom, $email];
     }
-          
+
+
+    private function getTableNamesAction()
+    {
+        $names = $this->model->getDBTablesNames('test');
+        print_r($names);
+    }
 }

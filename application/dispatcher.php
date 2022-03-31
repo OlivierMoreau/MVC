@@ -40,6 +40,7 @@
                 $this->error("wrong controller");
             }     
         }
+        // 404 error
         public function error($error_type)
         {
             header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);

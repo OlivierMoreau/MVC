@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="En">
 
@@ -12,11 +10,9 @@
     <link rel="stylesheet" href="{URL}css/main.css">
     <link rel="stylesheet" href="{URL}lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="{URL}lib/font-awesome/all.min.css">
+    <!-- <link rel="stylesheet" href="{URL}lib/datatable/dataTables.min.css"> -->
 </head>
 
 <body>
     <div class="container" role="main">
         <!-- Page content -->
-        <h1 class='text-info'>Hi this is a squelleton for simple MVC apps.</h1>
-
-
